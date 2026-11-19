@@ -1,0 +1,18 @@
+{
+  "name": "micro-front-end-ecommerce",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build:packages": "pnpm --filter \"@mfe/*\" build",
+    "build:apps": "pnpm --filter catalog build && pnpm --filter cart build && pnpm --filter shell build",
+    "build": "pnpm build:packages && pnpm build:apps",
+    "build:all": "pnpm build",
+    "dev:all": "concurrently -n \"catalog,cart,shell\" -c \"blue,green,magenta\" \"pnpm --filter catalog dev\" \"pnpm --filter cart dev\" \"pnpm --filter shell dev\"",
+    "start": "pnpm build && concurrently -n \"catalog,cart,shell\" -c \"blue,green,magenta\" \"pnpm --filter catalog preview\" \"pnpm --filter cart preview\" \"pnpm --filter shell preview\""
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.7",
+    "typescript": "^5.7.2"
+  },
+  "packageManager": "pnpm@10.28.1+sha512.7d7dbbca9e99447b7c3bf7a73286afaaf6be99251eb9498baefa7d406892f67b879adb3a1d7e687fc4ccc1a388c7175fbaae567a26ab44d1067b54fcb0d6a316"
+}
