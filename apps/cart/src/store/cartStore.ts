@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import type { CartItem, Product } from '@mfe/shared-types';
-import { subscribeAddToCart } from '@mfe/shared-events';
+import { subscribeAddToCart, subscribeCartClear } from '@mfe/shared-events';
 
 const STORAGE_KEY = 'mfe_ecommerce_cart';
 
@@ -8,12 +8,16 @@ class CartStore {
   private items: CartItem[] = [];
   private listeners: Set<() => void> = new Set();
   private unsubscribeEvent?: () => void;
+  private unsubscribeClearEvent?: () => void;
 
   constructor() {
     this.loadFromStorage();
     if (typeof window !== 'undefined') {
       this.unsubscribeEvent = subscribeAddToCart((product: Product) => {
         this.addItem(product);
+      });
+      this.unsubscribeClearEvent = subscribeCartClear(() => {
+        this.clearCart();
       });
     }
   }

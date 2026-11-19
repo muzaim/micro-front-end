@@ -1,14 +1,17 @@
 import React, { lazy } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import RemoteBoundary from './RemoteBoundary';
+import { useAuthSession } from '../auth/authStore';
 
 const RemoteMiniCartBadge = lazy(() => import('cart/MiniCartBadge'));
 
 export const Header: React.FC = () => {
   const location = useLocation();
+  const { session, isAuthenticated, openModal, logout } = useAuthSession();
 
   const isProductsActive = location.pathname === '/' || location.pathname === '/products';
   const isCartActive = location.pathname === '/cart';
+  const isOrdersActive = location.pathname === '/orders';
 
   return (
     <header style={headerStyle}>
@@ -35,6 +38,12 @@ export const Header: React.FC = () => {
             >
               Cart
             </Link>
+            <Link
+              to="/orders"
+              style={isOrdersActive ? activeNavLinkStyle : navLinkStyle}
+            >
+              Pesanan Saya
+            </Link>
           </nav>
         </div>
 
@@ -49,6 +58,31 @@ export const Header: React.FC = () => {
           >
             <RemoteMiniCartBadge />
           </RemoteBoundary>
+
+          <div style={dividerStyle} />
+
+          {isAuthenticated && session?.user ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={userBadgeStyle}>
+                <span style={{ fontSize: '15px' }}>👤</span>
+                <div>
+                  <div style={{ fontSize: '13px', fontWeight: 700, color: '#0f172a', lineHeight: 1.2 }}>
+                    {session.user.name}
+                  </div>
+                  <div style={{ fontSize: '11px', color: '#16a34a', fontWeight: 600 }}>
+                    Token Aktif
+                  </div>
+                </div>
+              </div>
+              <button onClick={logout} style={logoutButtonStyle}>
+                Keluar
+              </button>
+            </div>
+          ) : (
+            <button onClick={openModal} style={loginButtonStyle}>
+              🔑 Masuk
+            </button>
+          )}
         </div>
       </div>
     </header>
@@ -133,4 +167,43 @@ const rightSectionStyle: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
   gap: '16px',
+};
+
+const dividerStyle: React.CSSProperties = {
+  width: '1px',
+  height: '24px',
+  backgroundColor: '#e2e8f0',
+};
+
+const userBadgeStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '8px',
+  padding: '4px 10px',
+  borderRadius: '8px',
+  backgroundColor: '#f8fafc',
+  border: '1px solid #e2e8f0',
+};
+
+const loginButtonStyle: React.CSSProperties = {
+  backgroundColor: '#2563eb',
+  color: '#ffffff',
+  border: 'none',
+  borderRadius: '6px',
+  padding: '7px 14px',
+  fontSize: '13px',
+  fontWeight: 600,
+  cursor: 'pointer',
+  transition: 'background-color 0.15s ease',
+};
+
+const logoutButtonStyle: React.CSSProperties = {
+  backgroundColor: '#f1f5f9',
+  color: '#475569',
+  border: '1px solid #cbd5e1',
+  borderRadius: '6px',
+  padding: '6px 12px',
+  fontSize: '12px',
+  fontWeight: 600,
+  cursor: 'pointer',
 };

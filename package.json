@@ -4,11 +4,11 @@
   "private": true,
   "scripts": {
     "build:packages": "pnpm --filter \"@mfe/*\" build",
-    "build:apps": "pnpm --filter catalog build && pnpm --filter cart build && pnpm --filter shell build",
+    "build:apps": "pnpm --filter catalog build && pnpm --filter cart build && pnpm --filter orders build && pnpm --filter shell build",
     "build": "pnpm build:packages && pnpm build:apps",
     "build:all": "pnpm build",
-    "dev:all": "concurrently -n \"catalog,cart,shell\" -c \"blue,green,magenta\" \"pnpm --filter catalog dev\" \"pnpm --filter cart dev\" \"pnpm --filter shell dev\"",
-    "start": "pnpm build && concurrently -n \"catalog,cart,shell\" -c \"blue,green,magenta\" \"pnpm --filter catalog preview\" \"pnpm --filter cart preview\" \"pnpm --filter shell preview\""
+    "dev:all": "concurrently -n \"catalog,cart,orders,shell\" -c \"blue,green,yellow,magenta\" \"pnpm --filter catalog dev\" \"pnpm --filter cart dev\" \"pnpm --filter orders dev\" \"pnpm --filter shell dev\"",
+    "start": "pnpm build && concurrently -n \"catalog,cart,orders,shell\" -c \"blue,green,yellow,magenta\" \"pnpm --filter catalog preview\" \"pnpm --filter cart preview\" \"pnpm --filter orders preview\" \"pnpm --filter shell preview\""
   },
   "devDependencies": {
     "concurrently": "^10.0.7",

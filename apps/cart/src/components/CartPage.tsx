@@ -3,9 +3,10 @@ import { useCart } from '../store/cartStore';
 
 interface CartPageProps {
   onContinueShopping?: () => void;
+  onProceedToCheckout?: () => void;
 }
 
-export const CartPage: React.FC<CartPageProps> = ({ onContinueShopping }) => {
+export const CartPage: React.FC<CartPageProps> = ({ onContinueShopping, onProceedToCheckout }) => {
   const { items, totalCount, totalPrice, updateQuantity, removeItem, clearCart } = useCart();
 
   const handleBackToShop = () => {
@@ -13,6 +14,14 @@ export const CartPage: React.FC<CartPageProps> = ({ onContinueShopping }) => {
       onContinueShopping();
     } else if (typeof window !== 'undefined') {
       window.location.href = '/';
+    }
+  };
+
+  const handleProceedToCheckout = () => {
+    if (onProceedToCheckout) {
+      onProceedToCheckout();
+    } else if (typeof window !== 'undefined') {
+      window.location.href = '/checkout';
     }
   };
 
@@ -113,10 +122,10 @@ export const CartPage: React.FC<CartPageProps> = ({ onContinueShopping }) => {
           </div>
 
           <button
-            onClick={() => alert(`Demo checkout for $${grandTotal.toFixed(2)}! (MFE Order Flow Complete)`)}
+            onClick={handleProceedToCheckout}
             style={{ ...primaryBtnStyle, width: '100%', marginTop: '20px' }}
           >
-            Proceed to Checkout
+            Proceed to Checkout →
           </button>
           <button
             onClick={handleBackToShop}

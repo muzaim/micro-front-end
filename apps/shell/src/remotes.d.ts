@@ -13,6 +13,29 @@ declare module 'cart/MiniCartBadge' {
 
 declare module 'cart/CartPage' {
   import React from 'react';
-  const CartPage: React.ComponentType<{ onContinueShopping?: () => void }>;
+  const CartPage: React.ComponentType<{
+    onContinueShopping?: () => void;
+    onProceedToCheckout?: () => void;
+  }>;
   export default CartPage;
+}
+
+declare module 'orders/CheckoutPage' {
+  import React from 'react';
+  import type { Order } from '@mfe/shared-types';
+  const CheckoutPage: React.ComponentType<{
+    onOrderSuccess?: (order: Order) => void;
+    onRequestLogin?: () => void;
+    onBackToCart?: () => void;
+  }>;
+  export default CheckoutPage;
+}
+
+declare module 'orders/OrdersPage' {
+  import React from 'react';
+  const OrdersPage: React.ComponentType<{
+    onContinueShopping?: () => void;
+    onRequestLogin?: () => void;
+  }>;
+  export default OrdersPage;
 }
