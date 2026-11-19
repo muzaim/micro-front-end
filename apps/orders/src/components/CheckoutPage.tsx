@@ -103,10 +103,12 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
             Untuk melanjutkan ke halaman checkout, Anda harus login terlebih dahulu dengan akun dummy yang telah disepakati.
           </p>
           <div style={credentialBoxStyle}>
-            <p style={{ margin: 0, fontWeight: 600, color: '#334155' }}>Kredensial Login Dummy:</p>
-            <p style={{ margin: '4px 0 0 0', fontFamily: 'monospace', color: '#2563eb' }}>
-              Email: <strong>user@mfe.com</strong> | Password: <strong>password123</strong>
-            </p>
+            <p style={{ margin: 0, fontWeight: 600, color: '#334155', fontSize: '13px' }}>Akun Uji Coba (Password: <code>password123</code>):</p>
+            <ul style={{ margin: '6px 0 0 0', paddingLeft: '18px', fontSize: '12px', color: '#2563eb', textAlign: 'left', lineHeight: 1.6 }}>
+              <li><strong>Budi Santoso</strong>: budi@mfe.com (alias: user@mfe.com)</li>
+              <li><strong>Siti Rahma</strong>: siti@mfe.com</li>
+              <li><strong>Andi Pratama</strong>: andi@mfe.com</li>
+            </ul>
           </div>
           <button
             onClick={() => {

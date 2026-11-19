@@ -1,16 +1,23 @@
 import { useState, useEffect } from 'react';
 import type { CartItem, Product } from '@mfe/shared-types';
-import { subscribeAddToCart, subscribeCartClear } from '@mfe/shared-events';
+import { subscribeAddToCart, subscribeCartClear, subscribeAuthStateChange } from '@mfe/shared-events';
 
-const STORAGE_KEY = 'mfe_ecommerce_cart';
+export const AUTH_STORAGE_KEY = 'mfe_auth_session';
+
+export function getCartStorageKey(userId?: string): string {
+  return userId ? `mfe_ecommerce_cart_${userId}` : 'mfe_ecommerce_cart_guest';
+}
 
 class CartStore {
   private items: CartItem[] = [];
+  private currentUserId?: string;
   private listeners: Set<() => void> = new Set();
   private unsubscribeEvent?: () => void;
   private unsubscribeClearEvent?: () => void;
+  private unsubscribeAuthEvent?: () => void;
 
   constructor() {
+    this.currentUserId = this.getActiveUserId();
     this.loadFromStorage();
     if (typeof window !== 'undefined') {
       this.unsubscribeEvent = subscribeAddToCart((product: Product) => {
@@ -19,15 +26,45 @@ class CartStore {
       this.unsubscribeClearEvent = subscribeCartClear(() => {
         this.clearCart();
       });
+      this.unsubscribeAuthEvent = subscribeAuthStateChange((session) => {
+        const newUserId = session?.user?.id;
+        if (newUserId !== this.currentUserId) {
+          this.currentUserId = newUserId;
+          this.loadFromStorage();
+          this.listeners.forEach((listener) => listener());
+        }
+      });
     }
+  }
+
+  private getActiveUserId(): string | undefined {
+    if (typeof window === 'undefined') return undefined;
+    try {
+      const raw = localStorage.getItem(AUTH_STORAGE_KEY);
+      if (raw) {
+        const session = JSON.parse(raw);
+        return session?.user?.id;
+      }
+    } catch {
+      return undefined;
+    }
+    return undefined;
   }
 
   private loadFromStorage() {
     if (typeof window === 'undefined') return;
     try {
-      const data = localStorage.getItem(STORAGE_KEY);
+      const key = getCartStorageKey(this.currentUserId);
+      const data = localStorage.getItem(key);
       if (data) {
         this.items = JSON.parse(data);
+      } else {
+        if (!this.currentUserId) {
+          const legacy = localStorage.getItem('mfe_ecommerce_cart');
+          this.items = legacy ? JSON.parse(legacy) : [];
+        } else {
+          this.items = [];
+        }
       }
     } catch {
       this.items = [];
@@ -37,7 +74,8 @@ class CartStore {
   private saveToStorage() {
     if (typeof window === 'undefined') return;
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(this.items));
+      const key = getCartStorageKey(this.currentUserId);
+      localStorage.setItem(key, JSON.stringify(this.items));
     } catch {
       // Ignore quota/storage errors
     }
@@ -96,6 +134,14 @@ class CartStore {
 
   public clearCart() {
     this.items = [];
+    if (typeof window !== 'undefined') {
+      try {
+        const key = getCartStorageKey(this.currentUserId);
+        localStorage.removeItem(key);
+      } catch {
+        // Ignore
+      }
+    }
     this.notify();
   }
 }

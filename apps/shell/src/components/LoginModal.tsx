@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { useAuthSession, DUMMY_CREDENTIALS } from '../auth/authStore';
+import { useAuthSession, DUMMY_USERS } from '../auth/authStore';
 
 export const LoginModal: React.FC = () => {
   const { isModalOpen, closeModal, login } = useAuthSession();
-  const [email, setEmail] = useState(DUMMY_CREDENTIALS.email);
-  const [password, setPassword] = useState(DUMMY_CREDENTIALS.password);
+  const [email, setEmail] = useState(DUMMY_USERS[0].email);
+  const [password, setPassword] = useState(DUMMY_USERS[0].password);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -49,13 +49,62 @@ export const LoginModal: React.FC = () => {
           Login ini mensimulasikan otentikasi di Host Shell. Token sesi akan dibagikan ke remote apps (Catalog, Cart, Orders) via LocalStorage & Browser Events.
         </p>
 
-        <div style={hintBoxStyle}>
-          <div style={{ fontWeight: 600, color: '#1e3a8a', fontSize: '12px', marginBottom: '4px' }}>
-            💡 Kredensial Dummy yang Disepakati:
+        {/* 1-Click Quick Select Profile */}
+        <div style={{ marginBottom: '16px' }}>
+          <div style={{ fontSize: '12px', fontWeight: 600, color: '#475569', marginBottom: '8px' }}>
+            ⚡ Pilih Cepat Akun Demo (1-Click Autofill):
           </div>
-          <div style={{ fontSize: '12px', fontFamily: 'monospace', color: '#1d4ed8' }}>
-            Email: <strong>{DUMMY_CREDENTIALS.email}</strong><br />
-            Password: <strong>{DUMMY_CREDENTIALS.password}</strong>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
+            {DUMMY_USERS.map((acc) => {
+              const isSelected = email === acc.email || email === acc.aliasEmail;
+              return (
+                <button
+                  key={acc.user.id}
+                  type="button"
+                  onClick={() => {
+                    setEmail(acc.email);
+                    setPassword(acc.password);
+                    setError('');
+                  }}
+                  style={{
+                    padding: '8px',
+                    border: isSelected ? '2px solid #2563eb' : '1px solid #cbd5e1',
+                    borderRadius: '6px',
+                    background: isSelected ? '#eff6ff' : '#ffffff',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '2px',
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  <span style={{ fontWeight: 600, fontSize: '12px', color: '#0f172a' }}>
+                    {acc.user.name}
+                  </span>
+                  <span style={{ fontSize: '11px', color: '#64748b' }}>
+                    {acc.email}
+                  </span>
+                  <span style={{ fontSize: '10px', color: '#2563eb', fontWeight: 500 }}>
+                    ID: {acc.user.id}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div style={hintBoxStyle}>
+          <div style={{ fontWeight: 600, color: '#1e3a8a', fontSize: '12px', marginBottom: '6px' }}>
+            💡 Kredensial 3 Akun Dummy:
+          </div>
+          <div style={{ fontSize: '11px', color: '#1e40af', display: 'flex', flexDirection: 'column', gap: '3px' }}>
+            <div>1. <strong>Budi Santoso</strong>: budi@mfe.com (alias: user@mfe.com)</div>
+            <div>2. <strong>Siti Rahma</strong>: siti@mfe.com</div>
+            <div>3. <strong>Andi Pratama</strong>: andi@mfe.com</div>
+            <div style={{ marginTop: '2px', color: '#3b82f6' }}>
+              Password semua akun: <code>password123</code>
+            </div>
           </div>
         </div>
 

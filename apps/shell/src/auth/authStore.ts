@@ -4,16 +4,49 @@ import { publishAuthStateChange, subscribeAuthStateChange } from '@mfe/shared-ev
 
 export const AUTH_STORAGE_KEY = 'mfe_auth_session';
 
-export const DUMMY_CREDENTIALS = {
-  email: 'user@mfe.com',
-  password: 'password123',
-  user: {
-    id: 'usr-888',
-    name: 'Budi Developer',
-    email: 'user@mfe.com',
-  } as AuthUser,
-  token: 'mock-jwt-token-mfe-2026-usr888',
-};
+export interface DummyAccount {
+  email: string;
+  aliasEmail?: string;
+  password: string;
+  user: AuthUser;
+  token: string;
+}
+
+export const DUMMY_USERS: DummyAccount[] = [
+  {
+    email: 'budi@mfe.com',
+    aliasEmail: 'user@mfe.com',
+    password: 'password123',
+    user: {
+      id: 'usr-001',
+      name: 'Budi Santoso',
+      email: 'budi@mfe.com',
+    },
+    token: 'mock-jwt-budi-001',
+  },
+  {
+    email: 'siti@mfe.com',
+    password: 'password123',
+    user: {
+      id: 'usr-002',
+      name: 'Siti Rahma',
+      email: 'siti@mfe.com',
+    },
+    token: 'mock-jwt-siti-002',
+  },
+  {
+    email: 'andi@mfe.com',
+    password: 'password123',
+    user: {
+      id: 'usr-003',
+      name: 'Andi Pratama',
+      email: 'andi@mfe.com',
+    },
+    token: 'mock-jwt-andi-003',
+  },
+];
+
+export const DUMMY_CREDENTIALS = DUMMY_USERS[0];
 
 class AuthStore {
   private session: AuthSession | null = null;
@@ -83,13 +116,17 @@ class AuthStore {
   }
 
   public login(email: string, password: string): { success: boolean; error?: string } {
-    if (
-      email.trim().toLowerCase() === DUMMY_CREDENTIALS.email &&
-      password === DUMMY_CREDENTIALS.password
-    ) {
+    const cleanedEmail = email.trim().toLowerCase();
+    const matchedAccount = DUMMY_USERS.find(
+      (acc) =>
+        (acc.email.toLowerCase() === cleanedEmail || acc.aliasEmail?.toLowerCase() === cleanedEmail) &&
+        acc.password === password
+    );
+
+    if (matchedAccount) {
       this.session = {
-        token: DUMMY_CREDENTIALS.token,
-        user: DUMMY_CREDENTIALS.user,
+        token: matchedAccount.token,
+        user: matchedAccount.user,
         expiresAt: Date.now() + 24 * 60 * 60 * 1000,
       };
       this.isModalOpen = false;
@@ -100,7 +137,7 @@ class AuthStore {
 
     return {
       success: false,
-      error: 'Email atau password salah. Gunakan user@mfe.com dan password123',
+      error: 'Email atau password salah. Silakan pilih salah satu akun dummy yang tersedia.',
     };
   }
 

@@ -4,7 +4,10 @@ import { publishCartClear, publishOrderCreated, subscribeAuthStateChange } from 
 
 const ORDERS_STORAGE_KEY = 'mfe_ecommerce_orders';
 const AUTH_STORAGE_KEY = 'mfe_auth_session';
-const CART_STORAGE_KEY = 'mfe_ecommerce_cart';
+
+export function getCartStorageKey(userId?: string): string {
+  return userId ? `mfe_ecommerce_cart_${userId}` : 'mfe_ecommerce_cart_guest';
+}
 
 class OrderStore {
   private orders: Order[] = [];
@@ -64,8 +67,15 @@ class OrderStore {
   public getCartItems(): CartItem[] {
     if (typeof window === 'undefined') return [];
     try {
-      const data = localStorage.getItem(CART_STORAGE_KEY);
-      return data ? JSON.parse(data) : [];
+      const session = this.getActiveSession();
+      const key = getCartStorageKey(session?.user?.id);
+      const data = localStorage.getItem(key);
+      if (data) return JSON.parse(data);
+      if (!session?.user?.id) {
+        const legacy = localStorage.getItem('mfe_ecommerce_cart');
+        return legacy ? JSON.parse(legacy) : [];
+      }
+      return [];
     } catch {
       return [];
     }
@@ -110,7 +120,8 @@ class OrderStore {
     // Clear cart in local storage and notify system
     if (typeof window !== 'undefined') {
       try {
-        localStorage.removeItem(CART_STORAGE_KEY);
+        const key = getCartStorageKey(session.user.id);
+        localStorage.removeItem(key);
       } catch {
         // Ignore
       }
